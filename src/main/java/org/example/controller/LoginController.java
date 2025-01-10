@@ -31,7 +31,7 @@ private LoginValidation loginValidation;
     public ApplicationResponce loginUser(@RequestBody  LoginModel loginModel) {
         try {
             loginValidation.validate(loginModel);
-            ApplicationResponce applicationResponce=   loginService.loginuser(loginModel);
+            ApplicationResponce applicationResponce=  loginService.loginuser(loginModel);
             return applicationResponce;
         } catch (ValidationException validate) {
             ApplicationResponce applicationResponce = new ApplicationResponce();
