@@ -8,6 +8,7 @@ import org.example.model.ResistrationModel;
 import org.example.repository.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,24 +23,22 @@ public class LoginService extends ServiceException {
         super(errormsg);
     }
 
-    public ApplicationResponce loginuser(LoginModel loginModel) throws ServiceException {
-        Optional<ResistrationModel> userid = loginRepository.findById(loginModel.getUserId());
+    public Mono<ApplicationResponce> loginuser(LoginModel loginModel) throws ServiceException {
         List<Error> errorList = new ArrayList<>();
-        if (userid.isPresent()) {
-            ResistrationModel model = userid.get();
-            if (model.getPassword().equals(loginModel.getPassWord())) {
-                ApplicationResponce applicationResponce = new ApplicationResponce();
-                applicationResponce.setData("Login SuccessFully");
-                return applicationResponce;
-            }
-        } else {
-
-            errorList.add(new Error("Wroung credential", "23"));
-            ApplicationResponce applicationResponce = new ApplicationResponce();
-            applicationResponce.setError(errorList);
-
-        }
-        throw new ServiceException(errorList);
+        return loginRepository.findById(loginModel.getUserId())
+                .flatMap(user -> {
+                    if (user.getPassword().equals(loginModel.getPassWord())) {
+                        ApplicationResponce applicationResponse = new ApplicationResponce();
+                        applicationResponse.setData("Login Successfully");
+                        return Mono.just(applicationResponse); }
+                    else {
+                        errorList.add(new Error("Wrong credential", "23"));
+                        ApplicationResponce applicationResponse = new ApplicationResponce();
+                        applicationResponse.setError(errorList); return Mono.error(new ServiceException(errorList)); } })
+                .switchIfEmpty(Mono.defer(() -> {
+                    errorList.add(new Error("User not found", "404"));
+                    return Mono.error(new ServiceException(errorList));
+                }));
     }
 
 }

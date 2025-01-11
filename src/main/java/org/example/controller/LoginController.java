@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -28,22 +29,22 @@ private LoginValidation loginValidation;
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @RequestMapping("/loginUser")
-    public ApplicationResponce loginUser(@RequestBody  LoginModel loginModel) {
+    public Mono<ApplicationResponce> loginUser(@RequestBody  LoginModel loginModel) {
         try {
             loginValidation.validate(loginModel);
-            ApplicationResponce applicationResponce=  loginService.loginuser(loginModel);
+            Mono<ApplicationResponce> applicationResponce=  loginService.loginuser(loginModel);
             return applicationResponce;
         } catch (ValidationException validate) {
             ApplicationResponce applicationResponce = new ApplicationResponce();
             List<Error> errors = validate.getErrorMessage();
             applicationResponce.setError(errors);
-            return applicationResponce;
+            return Mono.just(applicationResponce);
 
         } catch (ServiceException e) {
             ApplicationResponce applicationResponce = new ApplicationResponce();
             List<Error> errors = e.getErrormsg();
             applicationResponce.setError(errors);
-            return applicationResponce;
+            return Mono.just(applicationResponce);
         }
 
     }

@@ -10,9 +10,6 @@ import reactor.core.publisher.Hooks;
 
 @Configuration
 public class ClientConfiguration {
-
-
-
     @Bean("webClientBuilder")
     @LoadBalanced
     public WebClient.Builder webClientBuilder() {
