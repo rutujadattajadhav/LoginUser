@@ -38,6 +38,7 @@ private LoginValidation loginValidation;
             ApplicationResponce applicationResponce = new ApplicationResponce();
             List<Error> errors = validate.getErrorMessage();
             applicationResponce.setError(errors);
+
             return Mono.just(applicationResponce);
 
         } catch (ServiceException e) {
