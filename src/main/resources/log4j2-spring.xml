@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${spring:logging.console.pattern}"/>
+        </Console>
+        <SplunkHttp
+                ignoreExceptions="false"
+                name="Splunk"
+                url="${spring:logging.splunk.url}"
+                token="${spring:logging.splunk.token}"
+                host="${spring:spring.webflux.base-path}"
+                index="${spring:logging.splunk.index}"
+                type="${spring:logging.splunk.type}"
+                source="${spring:spring.application.name}"
+                sourcetype="${spring:logging.splunk.sourcetype}"
+                messageFormat="${spring:logging.splunk.messageFormat}"
+                disableCertificateValidation="${spring:slogging.plunk.disableCertificateValidation}">
+            <PatternLayout pattern="{&quot;time&quot;:&quot;%d{ISO8601}&quot;,&quot;level&quot;:&quot;%p&quot;,&quot;thread&quot;:&quot;%t&quot;,&quot;logger&quot;:&quot;%c{1}&quot;,&quot;message&quot;:&quot;%enc{%m}&quot;,&quot;correlationId&quot;:&quot;%X{correlationId}&quot;,&quot;exception&quot;:&quot;%enc{%ex}&quot;}"/>
+        </SplunkHttp>
+    </Appenders>
+
+    <Loggers>
+        <!-- LOG everything at INFO level -->
+        <Root level="${spring:logging.level.root}">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="Splunk" />
+        </Root>
+    </Loggers>
+</Configuration>

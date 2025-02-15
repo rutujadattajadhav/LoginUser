@@ -4,15 +4,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoginModel {
-    private String userId;
+    private String email;
     private String passWord;
 
-    public String getUserId() {
-        return userId;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setEmail(String userId) {
+        this.email = userId;
     }
 
     public String getPassWord() {

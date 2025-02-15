@@ -1,6 +1,7 @@
 package org.example.validations;
 
 import org.example.exception.ValidationException;
+import org.example.handler.UserException;
 import org.example.model.Error;
 import org.example.model.LoginModel;
 import org.springframework.stereotype.Component;
@@ -17,19 +18,18 @@ public class LoginValidation extends ValidationException {
         super(errorMessage);
     }
 
-    public void validate(LoginModel loginModel) throws ValidationException {
-        List<Error> errorList=new ArrayList<>();
-        if(Objects.isNull(loginModel)){
-            errorList.add(new Error("Object is null","4"));
-        }else{
-            if(StringUtils.isEmpty(loginModel.getUserId())){
-                errorList.add(new Error("Please fill the User Id","5"));
-            }if(StringUtils.isEmpty(loginModel.getPassWord())){
-                errorList.add(new Error("Please fill the  Password","6"));
+    public void validate(LoginModel loginModel) throws ValidationException, UserException {
+
+        if (Objects.isNull(loginModel)) {
+            throw new UserException("Please fill the User Id and Password", 201);
+        } else {
+            if (StringUtils.isEmpty(loginModel.getEmail())) {
+                throw new UserException("Please fill the User Id", 202);
             }
-        }
-        if(!errorList.isEmpty()){
-          throw new ValidationException(errorList);
+            if (StringUtils.isEmpty(loginModel.getPassWord())) {
+                throw new UserException("Please fill the Password", 203);
+            }
+
         }
     }
 }

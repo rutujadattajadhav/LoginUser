@@ -1,43 +1,40 @@
 package org.example.service;
 
 import org.example.exception.ServiceException;
-import org.example.model.ApplicationResponce;
+import org.example.handler.UserException;
 import org.example.model.Error;
 import org.example.model.LoginModel;
-import org.example.model.ResistrationModel;
 import org.example.repository.LoginRepository;
+import org.example.response.ApplicationResponce;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class LoginService extends ServiceException {
     @Autowired
     private LoginRepository loginRepository;
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     public LoginService(List<Error> errormsg) {
         super(errormsg);
     }
 
-    public Mono<ApplicationResponce> loginuser(LoginModel loginModel) throws ServiceException {
-        List<Error> errorList = new ArrayList<>();
-        return loginRepository.findById(loginModel.getUserId())
+    public Mono<ApplicationResponce> loginuser(LoginModel loginModel)  {
+        ApplicationResponce applicationResponce  =new ApplicationResponce();
+        return loginRepository.findById(loginModel.getEmail())
                 .flatMap(user -> {
-                    if (user.getPassword().equals(loginModel.getPassWord())) {
-                        ApplicationResponce applicationResponse = new ApplicationResponce();
-                        applicationResponse.setData("Login Successfully");
-                        return Mono.just(applicationResponse); }
+                    if (passwordEncoder.matches(loginModel.getPassWord(), user.getPassword())) {
+                        applicationResponce.setData("Login Successfully");
+                        return Mono.just(applicationResponce); }
                     else {
-                        errorList.add(new Error("Wrong credential", "23"));
-                        ApplicationResponce applicationResponse = new ApplicationResponce();
-                        applicationResponse.setError(errorList); return Mono.error(new ServiceException(errorList)); } })
+                        return Mono.error(new UserException("Wrong credential",231)); } })
                 .switchIfEmpty(Mono.defer(() -> {
-                    errorList.add(new Error("User not found", "404"));
-                    return Mono.error(new ServiceException(errorList));
+                    return Mono.error(new UserException("User not found",404));
                 }));
     }
 

@@ -8,6 +8,7 @@ public class ServiceException extends Exception{
     private List<Error> errormsg;
 
     public ServiceException(List<Error> errormsg) {
+
         this.errormsg = errormsg;
     }
 
